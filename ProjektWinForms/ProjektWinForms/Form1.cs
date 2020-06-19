@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,78 +17,58 @@ namespace ProjektWinForms
         public Form1()
         {
             InitializeComponent();
+            
         }
 
         private void ImieTB_TextChanged(object sender, EventArgs e)
         {
-            ImieTB.MaxLength = 13;
-
-
-        }
-
-        private void PodajNazwisko_Click(object sender, EventArgs e)
-        {
-
+            EmailTB.MaxLength = 30;
         }
 
         private void NazwiskoTB_TextChanged(object sender, EventArgs e)
         {
-            NazwiskoTB.MaxLength = 30;
-
-
+            ImieTB.MaxLength = 30;
         }
 
+        public void Insert(SqlConnection connection, int id, string email, string numer, string imie)
+        {
+            var query = "INSERT INTO Użytkownik(ID_użytkownika, Email, Telefon, Imię)" +
+                "VALUES (@id, @email, @numer, @imie)";
+            var command = new SqlCommand(query, connection);
 
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@email", email);
+            command.Parameters.AddWithValue("@numer", numer);
+            command.Parameters.AddWithValue("@imie", imie);
+
+            
+            MessageBox.Show($"Zapisano użytkownika {EmailTB.Text} do DB", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+        }
 
         private void PotwierdźBTN_Click(object sender, EventArgs e)
         {
-            
-            if (ImieTB.TextLength <= 0)
+            if (EmailTB.TextLength <= 0)
             {
-                MessageBox.Show("Podaj swoje imię!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Podaj swoje imię!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             else
             {
+                while (true)
+                {
+                    int i = 1;
+                    var connectionString = @"Data Source = (localdb)\MSSQLLocalDB; Initial Catalog = Projekt; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False";
+                    SqlConnection connection = new SqlConnection(connectionString);
+                    connection.Open();
+                    Insert(connection, i, EmailTB.Text, NumerTB.Text, ImieTB.Text);
+                    connection.Close();
+
+                    i++;
+                    break;
+                }
+                
                 
             }
-            if (NazwiskoTB.TextLength <= 0)
-            {
-                MessageBox.Show("Podaj swoje nazwisko!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                
-            }
-            if (WyborTrasyCB.SelectedIndex != -1)
-            {
-                
-            }
-            else
-            {
-                MessageBox.Show("Wybierz trasę!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            if (RodzajKarnetuCB.SelectedIndex != -1)
-            {
-                
-            }
-            else
-            {
-                MessageBox.Show("Wybierz rodzaj karnetu!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-
-
-            WyczyśćBTN.Visible = true;
-            
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void WyborTrasyCB_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
         }
 
         private void RodzajKarnetuCB_SelectedIndexChanged(object sender, EventArgs e)
@@ -108,41 +89,20 @@ namespace ProjektWinForms
             }
         }
 
-        private void ZjazdowyLB_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void CzasowyLB_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ZjazdowyCB_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void CzasowyCB_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void PodajWiekDTP_ValueChanged(object sender, EventArgs e)
-        {
-            
-        }
-
         private void WyczyśćBTN_Click(object sender, EventArgs e)
         {
+            EmailTB.Clear();
             ImieTB.Clear();
-            NazwiskoTB.Clear();
+            NumerTB.Clear();
             WyborTrasyCB.SelectedIndex = -1;
             RodzajKarnetuCB.SelectedIndex = -1;
             CzasowyCB.SelectedIndex = -1;
             ZjazdowyCB.SelectedIndex = -1;
-            
-            
+        }
+
+        private void CzasowyCB_MouseEnter(object sender, EventArgs e)
+        {
+            CzasowyTIP.SetToolTip(CzasowyCB, "Ten czas podawany jest w minutach.");
         }
     }
 }
