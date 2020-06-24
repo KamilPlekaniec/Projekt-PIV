@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.NazwaOsrodka = new System.Windows.Forms.Label();
             this.PodajImie = new System.Windows.Forms.Label();
             this.EmailTB = new System.Windows.Forms.TextBox();
@@ -52,9 +53,10 @@
             // NazwaOsrodka
             // 
             this.NazwaOsrodka.AutoSize = true;
+            this.NazwaOsrodka.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.NazwaOsrodka.Location = new System.Drawing.Point(208, 20);
             this.NazwaOsrodka.Name = "NazwaOsrodka";
-            this.NazwaOsrodka.Size = new System.Drawing.Size(230, 20);
+            this.NazwaOsrodka.Size = new System.Drawing.Size(293, 22);
             this.NazwaOsrodka.TabIndex = 0;
             this.NazwaOsrodka.Text = "Ośrodek narciarski biała krecha";
             this.NazwaOsrodka.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -72,11 +74,11 @@
             // EmailTB
             // 
             this.EmailTB.Location = new System.Drawing.Point(258, 74);
-            this.EmailTB.MaxLength = 13;
+            this.EmailTB.MaxLength = 50;
             this.EmailTB.Name = "EmailTB";
             this.EmailTB.Size = new System.Drawing.Size(127, 26);
             this.EmailTB.TabIndex = 2;
-            this.EmailTB.TextChanged += new System.EventHandler(this.ImieTB_TextChanged);
+            this.EmailTB.TextChanged += new System.EventHandler(this.EmailTB_TextChanged);
             // 
             // PodajEmail
             // 
@@ -90,10 +92,11 @@
             // ImieTB
             // 
             this.ImieTB.Location = new System.Drawing.Point(258, 116);
+            this.ImieTB.MaxLength = 13;
             this.ImieTB.Name = "ImieTB";
             this.ImieTB.Size = new System.Drawing.Size(127, 26);
             this.ImieTB.TabIndex = 3;
-            this.ImieTB.TextChanged += new System.EventHandler(this.NazwiskoTB_TextChanged);
+            this.ImieTB.TextChanged += new System.EventHandler(this.ImieTB_TextChanged);
             // 
             // PodajNumer
             // 
@@ -230,7 +233,8 @@
             this.NumerTB.MaxLength = 9;
             this.NumerTB.Name = "NumerTB";
             this.NumerTB.Size = new System.Drawing.Size(127, 26);
-            this.NumerTB.TabIndex = 21;
+            this.NumerTB.TabIndex = 4;
+            this.NumerTB.TextChanged += new System.EventHandler(this.NumerTB_TextChanged);
             // 
             // Form1
             // 
@@ -255,6 +259,7 @@
             this.Controls.Add(this.PodajImie);
             this.Controls.Add(this.NazwaOsrodka);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

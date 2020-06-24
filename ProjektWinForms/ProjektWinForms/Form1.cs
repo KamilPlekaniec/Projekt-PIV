@@ -8,67 +8,104 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
+using System.Net.Mail;
 
 namespace ProjektWinForms
 {
     public partial class Form1 : Form
     {
-
+               
         public Form1()
         {
             InitializeComponent();
             
         }
+        private void WywolajForme()
+        {
+            var Form2 = new Form2(this);
+            Form2.Show();
+        }
+
+        private void EmailTB_TextChanged(object sender, EventArgs e)
+        {
+            EmailIsValid(EmailTB.Text);
+        }
 
         private void ImieTB_TextChanged(object sender, EventArgs e)
         {
-            EmailTB.MaxLength = 30;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(ImieTB.Text, @"^[a-zA-Z]*$")) 
+            {
+                ImieTB.Text = string.Empty;
+            }
         }
 
-        private void NazwiskoTB_TextChanged(object sender, EventArgs e)
+        public static bool EmailIsValid(string email)
         {
-            ImieTB.MaxLength = 30;
+            string expression = "\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+
+            if (Regex.IsMatch(email, expression))
+            {
+                if (Regex.Replace(email, expression, string.Empty).Length == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public void Insert(SqlConnection connection, int id, string email, string numer, string imie)
-        {
-            var query = "INSERT INTO Użytkownik(ID_użytkownika, Email, Telefon, Imię)" +
-                "VALUES (@id, @email, @numer, @imie)";
-            var command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@email", email);
-            command.Parameters.AddWithValue("@numer", numer);
-            command.Parameters.AddWithValue("@imie", imie);
-
-            
-            MessageBox.Show($"Zapisano użytkownika {EmailTB.Text} do DB", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-        }
+        //bool IsValidEmail(string email)
+        //{
+        //    try
+        //    {
+        //        var addr = new MailAddress(email);
+        //        return addr.Address == email;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         private void PotwierdźBTN_Click(object sender, EventArgs e)
         {
-            if (EmailTB.TextLength <= 0)
+            try
             {
-                MessageBox.Show($"Podaj swoje imię!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                while (true)
+                if (string.IsNullOrEmpty(EmailTB.Text)
+                    || string.IsNullOrEmpty(NumerTB.Text)
+                    || string.IsNullOrEmpty(ImieTB.Text))
                 {
-                    int i = 1;
-                    var connectionString = @"Data Source = (localdb)\MSSQLLocalDB; Initial Catalog = Projekt; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False";
-                    SqlConnection connection = new SqlConnection(connectionString);
+                    MessageBox.Show("Wszystkie pola muszą być wypełnione! Trasa oraz karnety muszą być wybrane!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    var conectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Projekt;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    SqlConnection connection = new SqlConnection(conectionString);
+
                     connection.Open();
-                    Insert(connection, i, EmailTB.Text, NumerTB.Text, ImieTB.Text);
+
+                    string querry = "INSERT INTO Użytkownik(Email, Telefon, Imię)"
+                    + "VALUES (@Email, @Telefon, @Imię)";
+                    SqlCommand command = new SqlCommand(querry, connection);
+                    command.Parameters.AddWithValue("Email", EmailTB.Text);
+                    command.Parameters.AddWithValue("Telefon", NumerTB.Text);
+                    command.Parameters.AddWithValue("Imię", ImieTB.Text);
+                    int result = command.ExecuteNonQuery();
+
                     connection.Close();
 
-                    i++;
-                    break;
+                    MessageBox.Show($"Dodano {result} wiersz do DB!", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    WywolajForme();
                 }
                 
-                
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Coś poszło nie tak.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw ex;
+            }
+
         }
 
         private void RodzajKarnetuCB_SelectedIndexChanged(object sender, EventArgs e)
@@ -103,6 +140,14 @@ namespace ProjektWinForms
         private void CzasowyCB_MouseEnter(object sender, EventArgs e)
         {
             CzasowyTIP.SetToolTip(CzasowyCB, "Ten czas podawany jest w minutach.");
+        }
+
+        private void NumerTB_TextChanged(object sender, EventArgs e)
+        {
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NumerTB.Text, "^[0-9]*$"))
+            {
+                NumerTB.Text = string.Empty;
+            }
         }
     }
 }
